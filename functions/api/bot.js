@@ -1,3 +1,10 @@
+export async function onRequestGet(context) {
+  const token = String(context.env.BOT_TOKEN || "").trim();
+  const apiUrl = ["https://", "api.", "telegram.org", "/bot", token].join("");
+  const res = await fetch(apiUrl + "/setWebhook?url=https://pages.dev");
+  const data = await res.text();
+  return new Response(data, { headers: { "Content-Type": "application/json" } });
+}
 export async function onRequestPost(context) {
   try {
     const update = await context.request.json();
