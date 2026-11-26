@@ -25,7 +25,7 @@ export async function onRequestPost(context) {
 
     const text = `🚀 Yangi buyurtma — EXC PLATFORM\n\n👤 Ism: ${name}\n📞 Aloqa: ${contact}\n🛠 Xizmat: ${service || "Tanlanmagan"}\n📝 Xabar: ${message || "Izoh qoldirilmagan"}`;
 
-    const tgRes = await fetch(`https://telegram.org{token}/sendMessage`, {
+    const tgRes = await fetch("https://telegram.org" + token + "/sendMessage", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ chat_id: chatId, text: text })
