@@ -8,4 +8,45 @@ const langSelect=document.getElementById("language");langSelect.value=localStora
 document.getElementById("year").textContent=new Date().getFullYear();
 document.getElementById("menuToggle").addEventListener("click",()=>document.getElementById("nav").classList.toggle("open"));
 document.querySelectorAll("#nav a").forEach(a=>a.addEventListener("click",()=>document.getElementById("nav").classList.remove("open")));
-document.getElementById("orderForm").addEventListener("submit",e=>{e.preventDefault();const lang=langSelect.value;document.getElementById("formStatus").textContent=translations[lang].formDemo;e.target.reset()});
+document.getElementById("orderForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const form = e.target;
+  const statusEl = document.getElementById("formStatus");
+  const btn = form.querySelector('button[type="submit"]');
+  const lang = document.getElementById("langSelect").value || "uz";
+
+  const msgs = {
+    uz: { sending: "Yuborilmoqda...", ok: "Rahmat! Buyurtmangiz qabul qilindi, tez orada bog'lanamiz.", err: "Xatolik yuz berdi. Qaytadan urinib ko'ring." },
+    ru: { sending: "Отправка...", ok: "Спасибо! Ваша заявка принята, скоро свяжемся.", err: "Произошла ошибка. Попробуйте еще раз." },
+    en: { sending: "Sending...", ok: "Thank you! Your order has been received, we will contact you soon.", err: "An error occurred. Please try again." }
+  };
+
+  btn.disabled = true;
+  statusEl.textContent = msgs[lang].sending;
+
+  const payload = {
+    name: form.name.value,
+    contact: form.contact.value,
+    service: form.service.value,
+    message: form.message.value
+  };
+
+  try {
+    const res = await fetch("/api/order", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    const result = await res.json();
+    if (res.ok && result.ok) {
+      statusEl.textContent = msgs[lang].ok;
+      form.reset();
+    } else {
+      statusEl.textContent = msgs[lang].err;
+    }
+  } catch {
+    statusEl.textContent = msgs[lang].err;
+  } finally {
+    btn.disabled = false;
+  }
+});
