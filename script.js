@@ -41,7 +41,7 @@ document.getElementById("orderForm").addEventListener("submit", async (e) => {
       statusEl.textContent = msgs[lang].ok;
       form.reset();
     } else {
-      3. statusEl.textContent = "Xato: " + (result.error || msgs[lang].err);
+      statusEl.textContent = "Xato: " + (result.error || msgs[lang].err);
     }
   } catch {
     statusEl.textContent = msgs[lang].err;
