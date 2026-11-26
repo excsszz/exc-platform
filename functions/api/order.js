@@ -25,7 +25,16 @@ export async function onRequestPost(context) {
 
     const text = `🚀 Yangi buyurtma — EXC PLATFORM\n\n👤 Ism: ${name}\n📞 Aloqa: ${contact}\n🛠 Xizmat: ${service || "Tanlanmagan"}\n📝 Xabar: ${message || "Izoh qoldirilmagan"}`;
 
-    const tgRes = await fetch("https://telegram.org" + token + "/sendMessage", {
+    const url = [
+      "https://",
+      "api.",
+      "telegram.org",
+      "/bot",
+      token,
+      "/sendMessage"
+    ].join("");
+
+    const tgRes = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ chat_id: chatId, text: text })
@@ -51,4 +60,3 @@ export async function onRequestPost(context) {
     });
   }
 }
-
