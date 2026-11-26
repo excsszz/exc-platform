@@ -13,8 +13,7 @@ document.getElementById("orderForm").addEventListener("submit", async (e) => {
   const form = e.target;
   const statusEl = document.getElementById("formStatus");
   const btn = form.querySelector('button[type="submit"]');
-  const lang = document.getElementById("lang").value || "uz";
-
+  const lang = localStorage.getItem("exc-lang") || "uz";
   const msgs = {
     uz: { sending: "Yuborilmoqda...", ok: "Rahmat! Buyurtmangiz qabul qilindi, tez orada bog'lanamiz.", err: "Xatolik yuz berdi. Qaytadan urinib ko'ring." },
     ru: { sending: "Отправка...", ok: "Спасибо! Ваша заявка принята, скоро свяжемся.", err: "Произошла ошибка. Попробуйте еще раз." },
