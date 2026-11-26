@@ -1,40 +1,40 @@
-export async function onRequestPost({ request, env }) {
+export async function onRequestPost(context) {
   try {
-    const data = await request.json();
-    const name = (data.name || "").trim();
-    const contact = (data.contact || "").trim();
-    const service = (data.service || "").trim();
-    const message = (data.message || "").trim();
+    const data = await context.request.json();
+    const name = String(data.name || "").trim();
+    const contact = String(data.contact || "").trim();
+    const service = String(data.service || "").trim();
+    const message = String(data.message || "").trim();
 
     if (!name || !contact) {
-      return new Response(JSON.stringify({ ok: false, error: "Ism va aloqa ma'lumoti kiritilishi shart" }), {
+      return new Response(JSON.stringify({ ok: false, error: "Ism va aloqa kiritilishi shart" }), {
         status: 400,
         headers: { "Content-Type": "application/json" }
       });
     }
 
-    const text = [
-      "🚀 *Yangi buyurtma — EXC PLATFORM*",
-      "",
-      `👤 *Ism:* ${name}`,
-      `📞 *Aloqa:* ${contact}`,
-      `🛠 *Xizmat:* ${service || "Tanlanmagan"}`,
-      `📝 *Xabar:* ${message || "Izoh qoldirilmagan"}`
-    ].join("\n");
+    const token = String(context.env.BOT_TOKEN || "").trim();
+    const chatId = String(context.env.CHAT_ID || "").trim();
 
-    const tgUrl = `https://telegram.org{env.BOT_TOKEN}/sendMessage`;
-    const tgRes = await fetch(tgUrl, {
+    if (!token || !chatId) {
+      return new Response(JSON.stringify({ ok: false, error: "BOT_TOKEN yoki CHAT_ID topilmadi" }), {
+        status: 500,
+        headers: { "Content-Type": "application/json" }
+      });
+    }
+
+    const text = `🚀 Yangi buyurtma — EXC PLATFORM\n\n👤 Ism: ${name}\n📞 Aloqa: ${contact}\n🛠 Xizmat: ${service || "Tanlanmagan"}\n📝 Xabar: ${message || "Izoh qoldirilmagan"}`;
+
+    const tgRes = await fetch(`https://telegram.org{token}/sendMessage`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        chat_id: env.CHAT_ID,
-        text: text,
-        parse_mode: "Markdown"
-      })
+      body: JSON.stringify({ chat_id: chatId, text: text })
     });
 
-    if (!tgRes.ok) {
-      return new Response(JSON.stringify({ ok: false, error: "Telegram xatosi" }), {
+    const tgData = await tgRes.json();
+
+    if (!tgRes.ok || !tgData.ok) {
+      return new Response(JSON.stringify({ ok: false, error: tgData.description || "Telegram rad etdi" }), {
         status: 500,
         headers: { "Content-Type": "application/json" }
       });
@@ -45,9 +45,10 @@ export async function onRequestPost({ request, env }) {
       headers: { "Content-Type": "application/json" }
     });
   } catch (err) {
-    return new Response(JSON.stringify({ ok: false, error: "Server xatosi" }), {
+    return new Response(JSON.stringify({ ok: false, error: String(err) }), {
       status: 500,
       headers: { "Content-Type": "application/json" }
     });
   }
 }
+
